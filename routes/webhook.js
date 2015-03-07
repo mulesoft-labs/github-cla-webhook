@@ -233,7 +233,7 @@ function setReviewState (owner, repository, sha, state) {
       }
     })
     .use(popsicleConstants(data))
-    .then(popsicleStatus())
+    .use(popsicleStatus())
 }
 
 /**
@@ -256,7 +256,7 @@ function checkClaSignature (username) {
       state: 'open'
     }
   })
-    .then(popsicleStatus())
+    .use(popsicleStatus())
     .then(function (res) {
       return res.body.some(isClaAgreement)
     })
@@ -304,7 +304,7 @@ function updatePullRequests (username) {
  */
 function updatePullRequestsBySearchUrl (url) {
   return request(url)
-    .then(popsicleStatus())
+    .use(popsicleStatus())
     .then(function (res) {
       var prs = res.body.items.map(function (issue) {
         return request(issue.pull_request.url)
