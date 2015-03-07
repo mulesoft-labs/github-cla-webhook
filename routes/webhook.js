@@ -1,11 +1,11 @@
 var lruCache = require('lru-cache')
 var popsicle = require('popsicle')
-var limits = require('limits.js')
 var debug = require('debug')('mulesoft-cla-webhook:webhook')
 var popsicleConstants = require('popsicle-constants')
 var popsicleStatus = require('popsicle-status')
 var popsiclePrefix = require('popsicle-prefix')
 var popsicleBasicAuth = require('popsicle-basic-auth')
+var popsicleLimit = require('popsicle-limit')
 var parseLinkHeader = require('parse-link-header')
 
 /**
@@ -36,37 +36,11 @@ var CLA_CACHE = lruCache({
 })
 
 /**
- * Popsicle plugin for limiting number of API requests.
- *
- * @param  {Object}   opts
- * @return {Function}
- */
-function popsicleLimits (opts) {
-  var service = limits(opts)
-
-  return function (req) {
-    var _then = req.then
-
-    req.then = function (onFulfilled, onRejected) {
-      var self = this
-
-      return new Promise(function (resolve, reject) {
-        service.push(function () {
-          _then.call(self, resolve, reject)
-        })
-      }).then(onFulfilled, onRejected)
-    }
-  }
-}
-
-/**
  * Limit GitHub API calls.
  *
  * @type {Function}
  */
-var githubLimits = popsicleLimits({
-  hourly: 5000
-})
+var githubLimit = popsicleLimit(5000, popsicleLimit.HOUR)
 
 /**
  * Personal GitHub API access token.
@@ -129,13 +103,11 @@ var STATE_DESCRIPTIONS = {
 function request (opts) {
   return popsicle(opts)
     .use(popsiclePrefix('https://api.github.com'))
-    .use(githubLimits)
-    .use(function (req) {
-      process.nextTick(function () {
-        debug(req.method + ' ' + req.url)
-      })
-    })
+    .use(githubLimit)
     .use(popsicleBasicAuth(ACCESS_TOKEN, 'x-oauth-basic'))
+    .before(function (req) {
+      debug(req.method + ' ' + req.url)
+    })
 }
 
 /**
