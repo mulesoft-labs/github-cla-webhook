@@ -37,7 +37,7 @@
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
     "pre-commit": "^1.0.1",
-    "standard": "^2.1.1"
+    "standard": "^3.2.1"
   },
   "dependencies": {
     "body-parser": "^1.12.0",
@@ -45,7 +45,7 @@
     "express": "^4.12.2",
     "lru-cache": "^2.5.0",
     "parse-link-header": "^0.2.0",
-    "popsicle": "^0.4.0",
+    "popsicle": "^0.5.6",
     "popsicle-basic-auth": "^0.1.0",
     "popsicle-constants": "^0.1.0",
     "popsicle-limit": "0.0.1",
