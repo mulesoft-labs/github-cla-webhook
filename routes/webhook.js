@@ -125,7 +125,7 @@ function webhook (req, res, next) {
   debug('new event: %s %s', name, id)
 
   if (CLA_USERS.indexOf(event.repository.owner.login) > -1) {
-    if (name === 'pull_request' && ['synchronize', 'opened'].indexOf(event.action) > -1) {
+    if (name === 'pull_request' && event.action === 'opened') {
       updatePullRequest(event.pull_request)
     } else if (name === 'issues' && event.action === 'opened' && event.repository.full_name === CLA_REPOSITORY && isClaAgreement(event.issue)) {
       updatePullRequests(event.issue.user.login)
