@@ -283,8 +283,8 @@ function isClaAgreement (issue) {
  * @return {Promise}
  */
 function updatePullRequests (username) {
-  var query = CLA_USERS.map(function (user) {
-    return 'user:' + user
+  var query = CLA_USERS.map(function (owner) {
+    return 'user:' + owner
   }).concat(['type:pr', 'author:' + username, 'is:open'])
 
   return updatePullRequestsBySearchUrl({
