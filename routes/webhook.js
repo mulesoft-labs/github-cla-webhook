@@ -196,7 +196,7 @@ function checkMembership (owner, repository, username) {
   var result = request('/repos/{owner}/{repo}/collaborators/{username}')
     .use(popsicleConstants(data))
     .then(function (res) {
-      return res.ok()
+      return res.statusType() === 2
     })
 
   MEMBER_CACHE.set(id, result)
