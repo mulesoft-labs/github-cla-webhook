@@ -164,7 +164,7 @@ function reviewStatus (owner, repository, username, sha) {
         })
     })
     .catch(function (err) {
-      console.log('review error: ', err)
+      console.log('review error: ', err.stack)
 
       return setReviewState(owner, repository, sha, STATES.ERROR)
     })
@@ -292,7 +292,7 @@ function updatePullRequests (username) {
     query: query
   })
     .catch(function (err) {
-      console.log('update error: ', err)
+      console.log('update error: ', err.stack)
     })
 }
 
