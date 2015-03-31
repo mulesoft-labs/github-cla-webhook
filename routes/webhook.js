@@ -283,11 +283,13 @@ function isClaAgreement (issue) {
 function updatePullRequests (username) {
   var query = CLA_USERS.map(function (owner) {
     return 'user:' + owner
-  }).concat(['type:pr', 'author:' + username, 'is:open'])
+  }).concat(['type:pr', 'author:' + username, 'is:open']).join(' ')
 
   return updatePullRequestsBySearchUrl({
     url: '/search/issues',
-    query: query
+    query: {
+      q: query
+    }
   })
     .catch(function (err) {
       console.log('update error: ', err.stack)
