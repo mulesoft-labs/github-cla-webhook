@@ -3,7 +3,7 @@ var popsicle = require('popsicle')
 var debug = require('debug')('mulesoft-cla-webhook:webhook')
 var popsicleConstants = require('popsicle-constants')
 var popsicleStatus = require('popsicle-status')
-var popsiclePrefix = require('popsicle-prefix')
+var popsicleResolve = require('popsicle-resolve')
 var popsicleBasicAuth = require('popsicle-basic-auth')
 var popsicleLimit = require('popsicle-limit')
 var parseLinkHeader = require('parse-link-header')
@@ -102,7 +102,7 @@ var STATE_DESCRIPTIONS = {
  */
 function request (opts) {
   return popsicle(opts)
-    .use(popsiclePrefix('https://api.github.com'))
+    .use(popsicleResolve('https://api.github.com'))
     .use(githubLimit)
     .use(popsicleBasicAuth(ACCESS_TOKEN, 'x-oauth-basic'))
     .before(function (req) {
