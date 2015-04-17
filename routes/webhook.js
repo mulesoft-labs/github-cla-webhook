@@ -126,7 +126,7 @@ function webhook (req, res, next) {
 
   if (CLA_USERS.indexOf(event.repository.owner.login) > -1 && name === 'pull_request' && event.action === 'opened') {
     updatePullRequest(event.pull_request)
-  } else if (event.repository.full_name === CLA_REPOSITORY && name === 'issues' && event.action === 'opened' && isClaAgreement(event.issue)) {
+  } else if (event.repository.full_name === CLA_REPOSITORY && name === 'issues' && event.action === 'opened') {
     updatePullRequests(event.issue.user.login)
   }
 
@@ -256,22 +256,12 @@ function checkClaSignature (username) {
   })
     .use(popsicleStatus())
     .then(function (res) {
-      return res.body.some(isClaAgreement)
+      return res.body.length > 0
     })
 
   CLA_CACHE.set(username, result)
 
   return result
-}
-
-/**
- * Verify the issue is a CLA agreement.
- *
- * @param  {Object}  issue
- * @return {Boolean}
- */
-function isClaAgreement (issue) {
-  return /^MuleSoft Contributor Agreement Acceptance/.test(issue.title)
 }
 
 /**
