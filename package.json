@@ -49,7 +49,7 @@
     "popsicle-basic-auth": "^0.1.0",
     "popsicle-constants": "^0.1.0",
     "popsicle-limit": "0.0.1",
-    "popsicle-prefix": "^0.1.0",
+    "popsicle-resolve": "0.0.2",
     "popsicle-status": "^0.1.0"
   }
 }
