@@ -122,12 +122,16 @@ function webhook (req, res, next) {
   var name = req.headers['x-github-event']
   var event = req.body
 
-  debug('new event: %s %s', name, id)
+  debug('webhook event: %s %s', name, id)
 
   if (CLA_USERS.indexOf(event.repository.owner.login) > -1 && name === 'pull_request' && event.action === 'opened') {
     updatePullRequest(event.pull_request)
-  } else if (event.repository.full_name === CLA_REPOSITORY && name === 'issues' && event.action === 'opened') {
-    updatePullRequests(event.issue.user.login)
+  } else if (event.repository.full_name === CLA_REPOSITORY && name === 'issues') {
+    if (event.action === 'opened' || event.action === 'reopened') {
+      updateUserCla(event.issue.user.login, true)
+    } else if (event.action === 'closed') {
+      updateUserCla(event.issue.user.login, false)
+    }
   }
 
   return res.end()
@@ -256,12 +260,36 @@ function checkClaSignature (username) {
   })
     .use(popsicleStatus())
     .then(function (res) {
+      debug('Found ' + res.body.length + ' issues at ' + CLA_REPOSITORY + ' by ' + username)
+
       return res.body.length > 0
     })
 
   CLA_CACHE.set(username, result)
 
   return result
+}
+
+/**
+ * Update the user signed status.
+ *
+ * @param  {String}  username
+ * @param  {Boolean} status
+ * @return {Promise}
+ */
+function updateUserCla (username, status) {
+  // Override the cached lookup.
+  CLA_CACHE.set(username, Promise.resolve(status))
+
+  debug('Updated ' + username + ' to ' + (status ? 'accepted' : 'declined'))
+
+  return updatePullRequests(username)
+    .then(function () {
+      debug('Pull requests by ' + username + ' have been ' + (status ? 'accepted' : 'declined'))
+    })
+    .catch(function (err) {
+      console.log('update user cla error: ', err.stack)
+    })
 }
 
 /**
@@ -275,25 +303,12 @@ function updatePullRequests (username) {
     return 'user:' + owner
   }).concat(['type:pr', 'author:' + username, 'is:open']).join(' ')
 
-  return updatePullRequestsBySearchUrl({
+  return request({
     url: '/search/issues',
     query: {
       q: query
     }
   })
-    .catch(function (err) {
-      console.log('update error: ', err.stack)
-    })
-}
-
-/**
- * Update all pull requests found by a search.
- *
- * @param  {String}  url
- * @return {Promise}
- */
-function updatePullRequestsBySearchUrl (url) {
-  return request(url)
     .use(popsicleStatus())
     .then(function (res) {
       var prs = res.body.items.map(function (issue) {
