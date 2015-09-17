@@ -3,14 +3,14 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-Automate CLA verification for open source repositories using GitHub issues.
+> Automate CLA verification for open source repositories using GitHub issues.
 
 ## Installation
 
 1. Create a new [personal access token](https://github.com/settings/applications) with **public_repo** scope (required for checking collaborators).
-2. Set environment variable.
+2. Set environment variables (below).
 3. Deploy.
-4. Enable webhook in all organisation settings using the CLA repository.
+4. Enable webhooks in the organisation/repository settings (`http://<url>/webhook`, with "Issues" and "Pull Requests" enabled), including the CLA repository.
 5. Profit!
 
 ## Environment Variables
